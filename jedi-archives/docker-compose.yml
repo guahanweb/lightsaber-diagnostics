@@ -1,0 +1,115 @@
+services:
+  # Kyber Crystal Service (API)
+  kyber-crystal-service:
+    build:
+      context: ../services/kyber-crystal-service
+      dockerfile: Dockerfile
+    container_name: kyber-crystal-service
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - ENERGY_FIELD_SERVICE_URL=http://energy-field-service:3001
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=kyber-crystal-service
+    volumes:
+      - ../services/kyber-crystal-service:/app
+      - /app/node_modules
+    depends_on:
+      - otel-collector
+    networks:
+      - lightsaber-net
+    restart: unless-stopped
+
+  # Energy Field Service (Processing)
+  energy-field-service:
+    build:
+      context: ../services/energy-field-service
+      dockerfile: Dockerfile
+    container_name: energy-field-service
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DEFAULT_TIMEOUT=2000
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_SERVICE_NAME=energy-field-service
+    volumes:
+      - ../services/energy-field-service:/app
+      - /app/node_modules
+    depends_on:
+      - otel-collector
+    networks:
+      - lightsaber-net
+    restart: unless-stopped
+
+  # OpenTelemetry Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./collector-config/otel-collector-config.yml:/etc/otel-collector-config.yml
+    ports:
+      - "4318:4318"  # OTLP HTTP receiver
+      - "4317:4317"  # OTLP gRPC receiver
+      - "8889:8889"  # Prometheus exporter
+    networks:
+      - lightsaber-net
+    restart: unless-stopped
+
+  # Jaeger - Tracing Visualization
+  jaeger:
+    image: jaegertracing/all-in-one:1.49
+    container_name: jaeger
+    ports:
+      - "16686:16686"  # UI
+      - "14250:14250"  # Model used by jaeger
+      - "14268:14268"  # HTTP receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - lightsaber-net
+    restart: unless-stopped
+
+  # Prometheus - Metrics Storage
+  prometheus:
+    image: prom/prometheus:v2.46.0
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - lightsaber-net
+    restart: unless-stopped
+
+  # Grafana - Metrics Visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - lightsaber-net
+    restart: unless-stopped
+
+networks:
+  lightsaber-net:
+    driver: bridge
+
+volumes:
+  grafana-storage:
