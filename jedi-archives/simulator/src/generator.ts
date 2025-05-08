@@ -86,7 +86,7 @@ const activateLightsaber = async () => {
             mode,
             powerLevel,
         }, {
-            timeout: 3000, // 3 second timeout
+            timeout: 5000, // 5 second timeout
         });
 
         log(`Activation result: ${response.data.success ? 'SUCCESS' : 'FAILURE'}`);

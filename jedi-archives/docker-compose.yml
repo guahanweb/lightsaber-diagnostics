@@ -13,6 +13,7 @@ services:
       - ENERGY_FIELD_SERVICE_URL=http://energy-field-service:3001
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_SERVICE_NAME=kyber-crystal-service
+      - DEFAULT_TIMEOUT=2000
     volumes:
       - ../services/kyber-crystal-service:/app
       - /app/node_modules

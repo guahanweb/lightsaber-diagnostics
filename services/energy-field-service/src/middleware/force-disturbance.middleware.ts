@@ -28,44 +28,53 @@ export const forceDisturbanceMiddleware = (req: Request, res: Response, next: Ne
             const willFail = delay > DEFAULT_TIMEOUT;
             span.setAttribute('force.will_fail', willFail);
 
-            if (willFail) {
-                // Simulate a timeout error after the default timeout period
-                setTimeout(() => {
-                    // Create an error object
-                    const error = new Error('Kyber crystal energy field collapsed due to force disturbance');
+            // We continue as normal and allow the client timeout to trap the error
+            setTimeout(() => {
+                span.setStatus({
+                    code: SpanStatusCode.OK
+                });
+                span.end();
+                next();
+            }, delay);
+
+            // if (willFail) {
+            //     // Simulate a timeout error after the default timeout period
+            //     setTimeout(() => {
+            //         // Create an error object
+            //         const error = new Error('Kyber crystal energy field collapsed due to force disturbance');
                     
-                    // Set the error status on the span
-                    span.setStatus({
-                        code: SpanStatusCode.ERROR,
-                        message: 'Force disturbance timeout'
-                    });
+            //         // Set the error status on the span
+            //         span.setStatus({
+            //             code: SpanStatusCode.ERROR,
+            //             message: 'Force disturbance timeout'
+            //         });
                     
-                    // Record the exception
-                    span.recordException(error);
+            //         // Record the exception
+            //         span.recordException(error);
                     
-                    // End the span AFTER setting the error status
-                    span.end();
+            //         // End the span AFTER setting the error status
+            //         span.end();
                     
-                    return res.status(504).json({
-                        error: 'Force disturbance timeout',
-                        message: 'Kyber crystal energy field collapsed due to force disturbance',
-                        mode: isCombatMode ? 'combat' : 'practice',
-                        delay,
-                        timeout: DEFAULT_TIMEOUT
-                    });
-                }, DEFAULT_TIMEOUT);
-            } else {
-                // Apply delay and continue
-                setTimeout(() => {
-                    // Set success status
-                    span.setStatus({
-                        code: SpanStatusCode.OK
-                    });
+            //         return res.status(504).json({
+            //             error: 'Force disturbance timeout',
+            //             message: 'Kyber crystal energy field collapsed due to force disturbance',
+            //             mode: isCombatMode ? 'combat' : 'practice',
+            //             delay,
+            //             timeout: DEFAULT_TIMEOUT
+            //         });
+            //     }, DEFAULT_TIMEOUT);
+            // } else {
+            //     // Apply delay and continue
+            //     setTimeout(() => {
+            //         // Set success status
+            //         span.setStatus({
+            //             code: SpanStatusCode.OK
+            //         });
                     
-                    span.end();
-                    next();
-                }, delay);
-            }
+            //         span.end();
+            //         next();
+            //     }, delay);
+            // }
         } catch (error: any) {
             // Set error status for unexpected errors
             span.setStatus({

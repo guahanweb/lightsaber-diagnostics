@@ -2,6 +2,8 @@ import axios from 'axios';
 import { activationCounter, failureCounter, activationDuration, trackCrystalPowerLevel } from '../metrics';
 import { trace, SpanStatusCode, Attributes } from '@opentelemetry/api';
 
+const DEFAULT_TIMEOUT = parseInt(process.env.DEFAULT_TIMEOUT || '2000', 10);
+
 // In-memory storage for simplicity
 const crystalActivations: Record<string, {
   id: string;
@@ -91,7 +93,8 @@ export async function activateCrystal(params: ActivationParams) {
             duration: 30 // Default duration in seconds
           },
           {
-            timeout: 5000 // 5 second timeout
+            timeout: DEFAULT_TIMEOUT // 2 seconds... long enough?
+            // timeout: 6000,
           }
         );
         
