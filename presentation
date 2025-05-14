@@ -1,0 +1,160 @@
+#!/bin/bash
+export DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+[[ -f "$DIR/scripts/utils.sh" ]] && source "$DIR/scripts/utils.sh"
+
+# presentation - Command runner for OpenTelemetry Lightsaber Diagnostics presentation
+# Usage: ./presentation <slide_number>
+
+clear_terminal() {
+  clear
+  echo "Lightsaber Diagnostics Demo - Slide $1"
+  echo "====================================================="
+  echo ""
+}
+
+# Check if a slide number was provided
+if [ -z "$1" ]; then
+  echo "Please provide a slide number"
+  echo "Usage: ./presentation <slide_number>"
+  echo ""
+  echo "Available slides:"
+  echo "1: It works in the training temple!"
+  echo "2: Monitoring vs. Observability"
+  echo "3: Trace vs. Span explanation"
+  echo "4: Three key OpenTelemetry components"
+  echo "5: Practice mode lightsaber activation"
+  echo "6: Combat mode lightsaber activation"
+  echo "7: Auto-instrumentation efficiency"
+  echo "8: Error handling importance"
+  echo "9: MYSTERY SOLVED!"
+  echo "10: Apply and test the fix"
+  echo "11: Final success message"
+  echo "12: Observability resources"
+  echo "0: Clear the terminal"
+  exit 1
+fi
+
+slide=$1
+clear_terminal $slide
+
+case $slide in
+  startup)
+    # Start the service
+    echo "${BOLD_WHITE}*** Starting the services ***${NC}"
+    cd $DIR/jedi-archives > /dev/null 2>&1
+    docker compose up -d
+    cd - > /dev/null 2>&1
+    ok "all services started"
+    ;;
+
+  1)
+    # It works in the training temple!
+    echo "${CYAN}*** It works in the training temple! ***${NC}"
+    ;;
+    
+  2)
+    # Monitoring vs. Observability
+    echo "${YELLOW}*** ${BOLD_WHITE}MONITORING${YELLOW} tells you THAT something is wrong. ***${NC}"
+    echo "${YELLOW}*** ${BOLD_WHITE}OBSERVABILITY${YELLOW} tells you WHY something is wrong. ***${NC}"
+    ;;
+    
+  3)
+    # Trace vs. Span explanation
+    echo "${CYAN}*** ${BOLD_WHITE}TRACE:${CYAN} Request journey across services ***${NC}"
+    echo "${CYAN}*** ${BOLD_WHITE}SPAN:${CYAN} Individual operation within that journey ***${NC}"
+    ;;
+    
+  4)
+    # OpenTelemetry components
+    echo "${BOLD_WHITE}*** Three key components: ***${NC}"
+    echo "*** 1. ${GREEN}SDK${NC} - Initialize OpenTelemetry ***"
+    echo "*** 2. ${GREEN}Auto-instrumentation${NC} - Automatic tracing ***"
+    echo "*** 3. ${GREEN}Exporters${NC} - Send data to visualization tools ***"
+    ;;
+    
+  5)
+    # Practice mode lightsaber activation
+    echo "${CYAN}*** Let's see a lightsaber activation in ${BOLD_WHITE}PRACTICE${CYAN} mode ***${NC}"
+    curl -X POST http://localhost:3000/api/crystals/activate \
+      -H "Content-Type: application/json" \
+      -d '{"crystalId": "crystal-001", "type": "blue", "ownerName": "Luke Skywalker", "powerLevel": 5, "mode": "practice"}'
+    echo ""
+    ;;
+    
+  6)
+    # Combat mode lightsaber activation
+    echo "${CYAN}*** Now let's try ${BOLD_RED}COMBAT${CYAN} mode ***${NC}"
+    curl -X POST http://localhost:3000/api/crystals/activate \
+      -H "Content-Type: application/json" \
+      -d '{"crystalId": "crystal-001", "type": "blue", "ownerName": "Luke Skywalker", "powerLevel": 8, "mode": "combat"}'
+    echo ""
+    # Try multiple times to ensure we get a failure
+    sleep 1
+    curl -X POST http://localhost:3000/api/crystals/activate \
+      -H "Content-Type: application/json" \
+      -d '{"crystalId": "crystal-001", "type": "blue", "ownerName": "Luke Skywalker", "powerLevel": 8, "mode": "combat"}'
+    echo ""
+    sleep 1
+    curl -X POST http://localhost:3000/api/crystals/activate \
+      -H "Content-Type: application/json" \
+      -d '{"crystalId": "crystal-001", "type": "blue", "ownerName": "Luke Skywalker", "powerLevel": 8, "mode": "combat"}'
+    echo ""
+    ;;
+    
+  7)
+    # Auto-instrumentation efficiency
+    echo "${BOLD_WHITE}*** ${BOLD_GREEN}Auto-instrumentation${BOLD_WHITE} gives you 80% visibility with 20% effort ***${NC}"
+    ;;
+    
+  8)
+    # Error handling importance
+    echo "${BOLD_WHITE}*** Good ${BOLD_RED}error handling${BOLD_WHITE} in spans makes debugging 10x easier ***${NC}"
+    ;;
+    
+  9)
+    # Mystery solved
+    echo "${GREEN}*** MYSTERY SOLVED! ***${NC}"
+    echo "*** ${BOLD_WHITE}Combat mode:${YELLOW} delays up to 5000ms${NC}"
+    echo "*** ${BOLD_WHITE}Timeout setting:${YELLOW} only 2000ms${NC}"
+    ;;
+    
+  10)
+    # Apply and test the fix
+    echo "${GREEN}*** Applying our fix and restarting the service ***${NC}"
+    cd $DIR/jedi-archives > /dev/null 2>&1
+    docker compose restart kyber-crystal-service
+    cd - > /dev/null 2>&1
+    sleep 5
+    ok "service restarted"
+    echo ""
+    echo "${GREEN}*** Testing our fix with combat mode activations ***${NC}"
+    curl -X POST http://localhost:3000/api/crystals/activate \
+      -H "Content-Type: application/json" \
+      -d '{"crystalId": "crystal-001", "type": "blue", "ownerName": "Luke Skywalker", "powerLevel": 8, "mode": "combat"}'
+    echo ""
+    ;;
+    
+  11)
+    # Final success message
+    echo "${GREEN}*** LIGHTSABERS NOW WORKING RELIABLY IN COMBAT! ***${NC}"
+    echo "${CYAN}*** The Jedi Council thanks you for your service ***${NC}"
+    ;;
+    
+  12)
+    # Resources
+    echo "${BOLD_WHITE}*** OpenTelemetry Resources: ***${NC}"
+    echo "*** ${CYAN}- https://opentelemetry.io/docs/getting-started/${NC} ***"
+    echo "*** ${CYAN}- https://github.com/guahanweb/lightsaber-diagnostics${NC} ***"
+    echo ""
+    echo "${BLUE}*** ${YELLOW}May the Force (and good observability) be with you!${BLUE} ***${NC}"
+    ;;
+    
+  0)
+    # Just clear the terminal
+    ;;
+    
+  *)
+    echo "Unknown slide number: $slide"
+    echo "Run './presentation' without arguments to see available slides"
+    ;;
+esac
