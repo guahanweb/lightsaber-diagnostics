@@ -38,6 +38,26 @@ slide=$1
 clear_terminal $slide
 
 case $slide in
+  title)
+    cat <<EOF
+ _____                _____    _                     _              
+|  _  |              |_   _|  | |                   | |             
+| | | |_ __   ___ _ __ | | ___| | ___ _ __ ___   ___| |_ _ __ _   _ 
+| | | | '_ \ / _ \ '_ \| |/ _ \ |/ _ \ '_ \` _ \ / _ \ __| '__| | | |
+\ \_/ / |_) |  __/ | | | |  __/ |  __/ | | | | |  __/ |_| |  | |_| |
+ \___/| .__/ \___|_| |_\_/\___|_|\___|_| |_| |_|\___|\__|_|   \__, |
+      | |                                                      __/ |
+      |_|                                                     |___/ 
+EOF
+    echo ""
+    echo "   ${BOLD_WHITE}Because ${BOLD_RED}\"It works on my machine\"${BOLD_WHITE} isn't a monitoring strategy.${NC}"
+    echo ""
+    echo -e "\t\t▬▬ι${GREEN}════════════════════════${NC}"
+    echo ""
+    echo -e "\t\t Presented by ${BOLD_WHITE}Garth Henson${NC}"
+    echo -e "\t\t  ${CYAN}Muse System Enterprises${NC}"
+    ;;
+
   startup)
     # Start the service
     echo "${BOLD_WHITE}*** Starting the services ***${NC}"
@@ -46,6 +66,7 @@ case $slide in
     cd - > /dev/null 2>&1
     ok "all services started"
     ;;
+
 
   1)
     # It works in the training temple!
